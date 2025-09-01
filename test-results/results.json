@@ -1,0 +1,160 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\노용석\\shiftlink\\shiftlink-app\\playwright.config.ts",
+    "rootDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\global-setup.ts",
+    "globalTeardown": "C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-results/html-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/junit.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/노용석/shiftlink/shiftlink-app/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "tests/**/*.spec.ts",
+          "tests/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/노용석/shiftlink/shiftlink-app/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "tests/**/*.spec.ts",
+          "tests/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/노용석/shiftlink/shiftlink-app/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "tests/**/*.spec.ts",
+          "tests/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/노용석/shiftlink/shiftlink-app/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "tests/**/*.spec.ts",
+          "tests/**/*.test.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/노용석/shiftlink/shiftlink-app/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "C:/Users/노용석/shiftlink/shiftlink-app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "tests/**/*.spec.ts",
+          "tests/**/*.test.ts"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 4,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: Vitest cannot be imported in a CommonJS module using require(). Please use \"import\" instead.\n\nIf you are using \"import\" in your source code, then it's possible it was bundled into require() automatically by your bundler. In that case, do not bundle CommonJS output since it will never work with Vitest, or use dynamic import() which is available in all CommonJS modules.",
+      "stack": "Error: Vitest cannot be imported in a CommonJS module using require(). Please use \"import\" instead.\n\nIf you are using \"import\" in your source code, then it's possible it was bundled into require() automatically by your bundler. In that case, do not bundle CommonJS output since it will never work with Vitest, or use dynamic import() which is available in all CommonJS modules.\n    at Object.<anonymous> (C:\\Users\\노용석\\shiftlink\\shiftlink-app\\node_modules\\vitest\\index.cjs:1:7)\n    at Object.<anonymous> (C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\lib\\scheduler\\schedule-engine.test.ts:1:1)",
+      "location": {
+        "file": "C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\lib\\scheduler\\schedule-engine.test.ts",
+        "column": 1,
+        "line": 1
+      },
+      "snippet": "\u001b[90m   at \u001b[39mlib\\scheduler\\schedule-engine.test.ts:1\n\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 1 |\u001b[39m \u001b[36mimport\u001b[39m { describe\u001b[33m,\u001b[39m it\u001b[33m,\u001b[39m expect\u001b[33m,\u001b[39m beforeEach\u001b[33m,\u001b[39m vi } \u001b[36mfrom\u001b[39m \u001b[32m'vitest'\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 2 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mScheduleEngine\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'@/lib/scheduler/schedule-engine'\u001b[39m\n \u001b[90m 3 |\u001b[39m\n \u001b[90m 4 |\u001b[39m \u001b[90m// Mock Supabase\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "SyntaxError: C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\nursing-industry\\shift-swapping-leave-management.spec.ts: Unexpected token, expected \",\" (880:56)\n\n\u001b[0m \u001b[90m 878 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"request-cancellation\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 879 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"cancellation-category\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'emergency'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 880 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"emergency-reason'\u001b[39m]\u001b[32m', '\u001b[39m가족 응급상황으로 출근 필요\u001b[32m');\u001b[39m\n \u001b[90m     |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 881 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"submit-cancellation-request\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 882 |\u001b[39m         \n \u001b[90m 883 |\u001b[39m         \u001b[90m// 관리자 승인 필요 알림\u001b[39m\u001b[0m",
+      "stack": "SyntaxError: C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\nursing-industry\\shift-swapping-leave-management.spec.ts: Unexpected token, expected \",\" (880:56)\n\n\u001b[0m \u001b[90m 878 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"request-cancellation\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 879 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"cancellation-category\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'emergency'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 880 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"emergency-reason'\u001b[39m]\u001b[32m', '\u001b[39m가족 응급상황으로 출근 필요\u001b[32m');\u001b[39m\n \u001b[90m     |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 881 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"submit-cancellation-request\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 882 |\u001b[39m         \n \u001b[90m 883 |\u001b[39m         \u001b[90m// 관리자 승인 필요 알림\u001b[39m\u001b[0m",
+      "location": {
+        "file": "C:\\Users\\노용석\\shiftlink\\shiftlink-app\\tests\\nursing-industry\\shift-swapping-leave-management.spec.ts",
+        "line": 880,
+        "column": 56
+      },
+      "snippet": "\u001b[90m   at \u001b[39mnursing-industry\\shift-swapping-leave-management.spec.ts:880\n\n\u001b[0m \u001b[90m 878 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"request-cancellation\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 879 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mselectOption(\u001b[32m'[data-testid=\"cancellation-category\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'emergency'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 880 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'[data-testid=\"emergency-reason'\u001b[39m]\u001b[32m', '\u001b[39m가족 응급상황으로 출근 필요\u001b[32m');\u001b[39m\n \u001b[90m     |\u001b[39m                                                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 881 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m'[data-testid=\"submit-cancellation-request\"]'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 882 |\u001b[39m         \n \u001b[90m 883 |\u001b[39m         \u001b[90m// 관리자 승인 필요 알림\u001b[39m\u001b[0m"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-09-01T08:26:24.507Z",
+    "duration": 2735.271,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
