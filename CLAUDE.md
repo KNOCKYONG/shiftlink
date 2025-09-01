@@ -111,35 +111,126 @@ ShiftLink는 3교대 근무 환경에서 근무자와 관리자의 고충을 해
   - [ ] PATCH /api/swaps/{id}/approve
   - [ ] PATCH /api/swaps/{id}/reject
 
-### Phase 7: 휴가/결근 관리 ⏳
-- [ ] 휴가 신청 폼
-- [ ] 결근 처리 로직
-- [ ] 스케줄 자동 재배치
-- [ ] API 엔드포인트 구현
-  - [ ] POST /api/leaves
-  - [ ] POST /api/absences
+### Phase 7: 휴가/결근 관리 ✅
+- [x] 휴가 신청 폼
+  - [x] 휴가 종류별 신청 (연차, 병가, 개인사유 등)
+  - [x] 날짜 선택 및 일수 자동 계산
+  - [x] 응급 휴가 토글
+  - [x] 사유 입력 및 첨부파일 업로드 준비
+  - [x] 실시간 폼 검증
+- [x] 휴가 잔액 관리 시스템
+  - [x] 휴가 종류별 잔여 일수 표시
+  - [x] 사용률 및 경고 시스템
+  - [x] 잔액 히스토리 추적
+- [x] 관리자 승인 인터페이스
+  - [x] 대기중인 요청 목록
+  - [x] 승인/거부 처리
+  - [x] 거부 사유 입력
+  - [x] 권한 기반 접근 제어
+- [x] 휴가 이력 조회
+  - [x] 필터링 및 검색 기능
+  - [x] 페이지네이션
+  - [x] CSV 내보내기
+  - [x] 통계 요약
+- [x] 결근 처리 로직 (스키마 준비)
+- [x] 스케줄 자동 재배치 (향후 연동 준비)
+- [x] API 엔드포인트 구현
+  - [x] GET /api/leaves (목록 조회)
+  - [x] POST /api/leaves (신청 생성)
+  - [x] GET /api/leaves/balance (잔액 조회)
+  - [x] GET /api/leaves/[id] (상세 조회)
+  - [x] PATCH /api/leaves/[id] (승인/거부/취소)
+  - [x] PATCH /api/leaves/balance (잔액 조정)
+- [x] 데이터베이스 스키마 완성
+  - [x] leave_policies (휴가 정책)
+  - [x] leave_balances (휴가 잔액)
+  - [x] leaves (휴가 신청)
+  - [x] 자동 승인 로직 (DB 트리거)
+  - [x] RLS 보안 정책 적용
+- [x] UI/UX 구성요소
+  - [x] LeaveRequestForm (신청 폼)
+  - [x] LeaveBalanceWidget (잔액 위젯)
+  - [x] LeaveManagementSection (통합 관리)
+  - [x] LeaveApprovalInterface (승인 관리)
+  - [x] LeaveHistory (이력 조회)
+- [x] 알림 시스템 (신청/승인/거부 알림)
+- [x] 감사 로그 (모든 변경사항 기록)
 
-### Phase 8: 모니터링 & 리포트 ⏳
-- [ ] 직원별 근무시간 집계
-- [ ] 연속 야간 근무 모니터링
-- [ ] 피로도 지표 계산
-- [ ] 팀별 숙련도/연차 균형 리포트
-- [ ] 대시보드 차트 구현
+### Phase 8: 모니터링 & 리포트 ✅
+- [x] 직원별 근무시간 집계
+  - [x] 일별/주별/월별 집계
+  - [x] 정규/초과/야간/주말 시간 분류
+  - [x] 주 52시간 위반 감지
+  - [x] 최소 휴식시간 위반 체크
+- [x] 연속 야간 근무 모니터링
+  - [x] 연속 야간 일수 추적
+  - [x] 연속 근무일 계산
+  - [x] 경고 임계값 설정
+- [x] 피로도 지표 계산
+  - [x] 다중 요인 기반 피로도 점수 (0-10)
+  - [x] 위험도 레벨 분류 (낮음/보통/높음/위험)
+  - [x] 개인별 권장사항 생성
+  - [x] 추세 분석 (개선/안정/악화)
+- [x] 팀별 숙련도/연차 균형 리포트
+  - [x] 연차 분포 분석
+  - [x] 교대별 숙련도 커버리지
+  - [x] 균형 점수 계산 (0-100)
+  - [x] 불균형 감지 및 권장사항
+- [x] 대시보드 차트 구현
+  - [x] KPI 카드 위젯
+  - [x] 통합 모니터링 대시보드
+  - [x] 실시간 알림 시스템
+  - [x] 데이터 내보내기 준비
+- [x] 데이터베이스 스키마
+  - [x] work_time_aggregations
+  - [x] fatigue_metrics
+  - [x] shift_statistics
+  - [x] team_balance_reports
+  - [x] performance_indicators
+  - [x] alert_thresholds
+  - [x] monitoring_alerts
+- [x] API 엔드포인트
+  - [x] GET/POST /api/monitoring/work-time
+  - [x] GET/POST /api/monitoring/fatigue
+  - [x] GET /api/monitoring/team-balance
+- [x] UI 컴포넌트
+  - [x] MonitoringDashboard
+  - [x] WorkTimeSummary
+  - [x] FatigueMonitor
+  - [x] TeamBalanceReport
 
-### Phase 9: 공유 기능 ⏳
-- [ ] 이메일 발송
-  - [ ] PDF 생성
-  - [ ] CSV 내보내기
-  - [ ] ICS 파일 생성
-- [ ] 카카오톡 알림톡 연동
-- [ ] 캘린더 연동
-  - [ ] iCal 구독 피드
-  - [ ] Google Calendar API
-  - [ ] Outlook 연동
-- [ ] API 엔드포인트 구현
-  - [ ] POST /api/share/email
-  - [ ] POST /api/share/kakao
-  - [ ] GET /api/ical/:token
+### Phase 9: 공유 기능 ✅
+- [x] 이메일 발송
+  - [x] PDF 생성 (jsPDF + autoTable)
+  - [x] CSV 내보내기 (UTF-8 BOM 지원)
+  - [x] ICS 파일 생성 (RFC 5545 표준)
+  - [x] HTML 이메일 템플릿
+  - [x] 다중 수신자 지원
+  - [x] 첨부파일 선택 옵션
+- [ ] 카카오톡 알림톡 연동 (BizMessage API 준비)
+- [x] 캘린더 연동
+  - [x] iCal 구독 피드
+  - [x] Google Calendar 링크 생성
+  - [x] Outlook 웹 연동
+  - [x] 캘린더 토큰 인증
+- [x] API 엔드포인트 구현
+  - [x] POST /api/share/email
+  - [ ] POST /api/share/kakao (준비중)
+  - [x] GET /api/ical/[token]
+  - [x] GET /api/schedules/[id]/export/pdf
+  - [x] GET /api/schedules/[id]/export/csv
+- [x] 라이브러리 통합
+  - [x] SchedulePDFGenerator 클래스
+  - [x] ScheduleCSVExporter 클래스
+  - [x] ScheduleCalendarGenerator 클래스
+  - [x] ScheduleMailer 서비스
+- [x] UI 컴포넌트
+  - [x] ScheduleShareDialog (통합 공유 대화상자)
+  - [x] 이메일/PDF/CSV/캘린더 탭
+  - [x] 다운로드 옵션
+- [x] 보안 및 권한
+  - [x] 관리자/매니저 권한 체크
+  - [x] 감사 로그 기록
 
 ### Phase 10: 설정 관리 ⏳
 - [ ] 제약 옵션 UI
@@ -220,6 +311,36 @@ shiftlink/
 ├── styles/               # 글로벌 스타일
 └── tests/                # 테스트 파일
 ```
+
+## MCP (Model Context Protocol) 활용
+
+### Supabase MCP Server
+이 프로젝트는 Supabase MCP Server를 활용하여 데이터베이스 작업을 수행합니다.
+
+**활용 영역**:
+- 데이터베이스 스키마 배포 및 마이그레이션
+- 테이블 생성/수정/삭제
+- RLS 정책 설정 및 관리
+- 실시간 구독 설정
+- 데이터 쿼리 및 조작
+- Edge Functions 배포
+
+**사용 가능한 MCP 명령**:
+- `supabase_execute_sql` - SQL 쿼리 실행
+- `supabase_list_tables` - 테이블 목록 조회
+- `supabase_get_table_schema` - 테이블 스키마 조회
+- `supabase_select` - 데이터 조회
+- `supabase_insert` - 데이터 삽입
+- `supabase_update` - 데이터 업데이트
+- `supabase_delete` - 데이터 삭제
+- `supabase_rpc` - RPC 함수 호출
+- `supabase_list_functions` - Edge Functions 목록 조회
+- `supabase_deploy_function` - Edge Function 배포
+
+**스키마 파일 위치**:
+- `shiftlink-app/supabase/schema.sql` - 메인 스키마
+- `shiftlink-app/supabase/schema_v2.sql` - 확장 스키마
+- `shiftlink-app/supabase/rls_policies.sql` - RLS 정책
 
 ## 환경 변수
 ```env

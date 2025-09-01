@@ -5,7 +5,10 @@
       "Bash(npx --yes create-next-app@latest shiftlink-app --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --turbopack)",
       "Bash(npm install:*)",
       "Bash(npx shadcn@latest init:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

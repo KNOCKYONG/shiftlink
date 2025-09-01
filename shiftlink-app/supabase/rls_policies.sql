@@ -58,6 +58,11 @@ CREATE POLICY "Users can view their own tenant" ON tenants
     id = get_user_tenant_id()
   );
 
+CREATE POLICY "Users can create tenants during signup" ON tenants
+  FOR INSERT WITH CHECK (
+    auth.uid() IS NOT NULL
+  );
+
 CREATE POLICY "Admins can manage tenants" ON tenants
   FOR ALL USING (
     is_admin()
@@ -67,6 +72,11 @@ CREATE POLICY "Admins can manage tenants" ON tenants
 CREATE POLICY "Users can view sites in their tenant" ON sites
   FOR SELECT USING (
     tenant_id = get_user_tenant_id()
+  );
+
+CREATE POLICY "Users can create sites during signup" ON sites
+  FOR INSERT WITH CHECK (
+    auth.uid() IS NOT NULL
   );
 
 CREATE POLICY "Admins can manage sites" ON sites
@@ -84,6 +94,11 @@ CREATE POLICY "Users can view teams in their tenant" ON teams
     )
   );
 
+CREATE POLICY "Users can create teams during signup" ON teams
+  FOR INSERT WITH CHECK (
+    auth.uid() IS NOT NULL
+  );
+
 CREATE POLICY "Managers can manage teams" ON teams
   FOR ALL USING (
     is_manager_or_admin() AND
@@ -98,6 +113,11 @@ CREATE POLICY "Managers can manage teams" ON teams
 CREATE POLICY "Users can view employees in their tenant" ON employees
   FOR SELECT USING (
     tenant_id = get_user_tenant_id()
+  );
+
+CREATE POLICY "Users can create employee records during signup" ON employees
+  FOR INSERT WITH CHECK (
+    auth_user_id = auth.uid()
   );
 
 CREATE POLICY "Users can update their own profile" ON employees
