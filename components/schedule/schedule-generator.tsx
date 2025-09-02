@@ -64,7 +64,7 @@ export function ScheduleGenerator({
   const [scheduleName, setScheduleName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [selectedSite, setSelectedSite] = useState<string>('')
+  const [selectedSite, setSelectedSite] = useState<string>('all')
   const [selectedTeams, setSelectedTeams] = useState<string[]>([])
   const [coverageRequirements, setCoverageRequirements] = useState<CoverageRequirement[]>([])
   const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
@@ -147,7 +147,7 @@ export function ScheduleGenerator({
       schedule_name: scheduleName,
       start_date: startDate,
       end_date: endDate,
-      site_id: selectedSite || null,
+      site_id: selectedSite === 'all' ? null : selectedSite,
       team_ids: selectedTeams,
       coverage_requirements: coverageRequirements,
       generation_options: generationOptions
@@ -201,7 +201,7 @@ export function ScheduleGenerator({
                   <SelectValue placeholder="사업장을 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">전체 사업장</SelectItem>
+                  <SelectItem value="all">전체 사업장</SelectItem>
                   {sites.map(site => (
                     <SelectItem key={site.id} value={site.id}>
                       {site.name}
