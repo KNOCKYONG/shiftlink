@@ -2,41 +2,52 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({ name, value, ...options })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({ name, value: '', ...options })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({ name, value: '', ...options })
-        },
-      },
+  try {
+    // 환경 변수 체크
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('Missing Supabase environment variables')
+      // 환경 변수가 없으면 그냥 통과시킴 (빌드 시점에 처리)
+      return NextResponse.next()
     }
-  )
+
+    let response = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    })
+
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          get(name: string) {
+            return request.cookies.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            request.cookies.set({ name, value, ...options })
+            response = NextResponse.next({
+              request: {
+                headers: request.headers,
+              },
+            })
+            response.cookies.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            request.cookies.set({ name, value: '', ...options })
+            response = NextResponse.next({
+              request: {
+                headers: request.headers,
+              },
+            })
+            response.cookies.set({ name, value: '', ...options })
+          },
+        },
+      }
+    )
 
   // 세션 새로 고침
   const {
@@ -166,7 +177,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return response
+    return response
+  } catch (error) {
+    console.error('Middleware error:', error)
+    // 에러 발생 시 요청을 그냥 통과시킴
+    return NextResponse.next()
+  }
 }
 
 export const config = {
