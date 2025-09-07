@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X } from 'lucide-react'
+import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X, ChevronDown, Filter } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -49,6 +49,12 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedEmployee, setEditedEmployee] = useState<Employee | null>(null)
+  
+  // Filter states
+  const [roleFilter, setRoleFilter] = useState<string>('all')
+  const [departmentFilter, setDepartmentFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  
   const supabase = createClient()
 
   useEffect(() => {
@@ -78,11 +84,28 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
     }
   }
 
-  const filteredEmployees = employees.filter(emp =>
-    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.department?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredEmployees = employees.filter(emp => {
+    // Search filter
+    const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.department?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    // Role filter
+    const matchesRole = roleFilter === 'all' || emp.role === roleFilter
+    
+    // Department filter
+    const matchesDepartment = departmentFilter === 'all' || 
+      (departmentFilter === 'none' ? !emp.department : emp.department === departmentFilter)
+    
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || 
+      (statusFilter === 'active' ? emp.is_active : !emp.is_active)
+    
+    return matchesSearch && matchesRole && matchesDepartment && matchesStatus
+  })
+
+  // Get unique departments for filter
+  const uniqueDepartments = Array.from(new Set(employees.map(emp => emp.department).filter(Boolean)))
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -163,7 +186,24 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>직원 목록</CardTitle>
+            <div className="flex items-center gap-4">
+              <CardTitle>직원 목록</CardTitle>
+              {(roleFilter !== 'all' || departmentFilter !== 'all' || statusFilter !== 'all') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setRoleFilter('all')
+                    setDepartmentFilter('all')
+                    setStatusFilter('all')
+                  }}
+                  className="text-xs"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  필터 초기화
+                </Button>
+              )}
+            </div>
             <div className="relative w-72">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -187,11 +227,56 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                 <TableRow>
                   <TableHead>이름</TableHead>
                   <TableHead>이메일</TableHead>
-                  <TableHead>역할</TableHead>
-                  <TableHead>부서</TableHead>
+                  <TableHead>
+                    <div className="flex items-center gap-1">
+                      <span>역할</span>
+                      <Select value={roleFilter} onValueChange={setRoleFilter}>
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <ChevronDown className="h-4 w-4" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">전체</SelectItem>
+                          <SelectItem value="admin">관리자</SelectItem>
+                          <SelectItem value="manager">매니저</SelectItem>
+                          <SelectItem value="employee">직원</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center gap-1">
+                      <span>부서</span>
+                      <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <ChevronDown className="h-4 w-4" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">전체</SelectItem>
+                          <SelectItem value="none">미지정</SelectItem>
+                          {uniqueDepartments.map(dept => (
+                            <SelectItem key={dept} value={dept || ''}>{dept}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </TableHead>
                   <TableHead>전화번호</TableHead>
                   <TableHead>입사일</TableHead>
-                  <TableHead>상태</TableHead>
+                  <TableHead>
+                    <div className="flex items-center gap-1">
+                      <span>상태</span>
+                      <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <ChevronDown className="h-4 w-4" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">전체</SelectItem>
+                          <SelectItem value="active">활성</SelectItem>
+                          <SelectItem value="inactive">비활성</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </TableHead>
                   <TableHead className="text-right">액션</TableHead>
                 </TableRow>
               </TableHeader>
