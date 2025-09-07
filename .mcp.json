@@ -10,7 +10,18 @@
         "--project-ref=igofcukuimzljtjaxfda"
       ],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": "sbp_20a52befb3bba512ff7778861277f56aa2035b1e"
+        "SUPABASE_ACCESS_TOKEN": "REPLACE_WITH_YOUR_SUPABASE_ACCESS_TOKEN"
+      }
+    },
+    "supabase-write": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-supabase"
+      ],
+      "env": {
+        "SUPABASE_URL": "${NEXT_PUBLIC_SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${SUPABASE_SERVICE_ROLE_KEY}"
       }
     }
   }
