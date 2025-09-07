@@ -17,30 +17,42 @@ export default async function SchedulePage() {
   const user = await requireAuth()
   const supabase = await createClient()
 
-  // 최근 스케줄 조회
-  const { data: recentSchedules } = await supabase
+  // 최근 스케줄 조회 - admin은 모든 스케줄 조회
+  let recentSchedulesQuery = supabase
     .from('schedules')
     .select(`
       *,
       employees:created_by(name),
       schedule_assignments(count)
     `)
-    .eq('tenant_id', user.tenantId)
     .order('created_at', { ascending: false })
     .limit(5)
+  
+  // admin이 아닌 경우에만 tenant_id 필터 적용
+  if (user.role !== 'admin') {
+    recentSchedulesQuery = recentSchedulesQuery.eq('tenant_id', user.tenantId)
+  }
+  
+  const { data: recentSchedules } = await recentSchedulesQuery
 
-  // 현재 활성 스케줄 조회
+  // 현재 활성 스케줄 조회 - admin은 모든 스케줄 조회
   const today = new Date().toISOString().split('T')[0]
-  const { data: activeSchedules } = await supabase
+  let activeSchedulesQuery = supabase
     .from('schedules')
     .select('*')
-    .eq('tenant_id', user.tenantId)
     .lte('start_date', today)
     .gte('end_date', today)
     .eq('status', 'confirmed')
+  
+  // admin이 아닌 경우에만 tenant_id 필터 적용
+  if (user.role !== 'admin') {
+    activeSchedulesQuery = activeSchedulesQuery.eq('tenant_id', user.tenantId)
+  }
+  
+  const { data: activeSchedules } = await activeSchedulesQuery
 
-  // 팀별 현재 근무자 조회
-  const { data: currentShifts } = await supabase
+  // 팀별 현재 근무자 조회 - admin은 모든 근무자 조회
+  let currentShiftsQuery = supabase
     .from('schedule_assignments')
     .select(`
       *,
@@ -48,7 +60,13 @@ export default async function SchedulePage() {
       shift_templates(name, type, start_time, end_time)
     `)
     .eq('date', today)
-    .eq('tenant_id', user.tenantId)
+  
+  // admin이 아닌 경우에만 tenant_id 필터 적용
+  if (user.role !== 'admin') {
+    currentShiftsQuery = currentShiftsQuery.eq('tenant_id', user.tenantId)
+  }
+  
+  const { data: currentShifts } = await currentShiftsQuery
 
   const getStatusColor = (status: string) => {
     switch (status) {
