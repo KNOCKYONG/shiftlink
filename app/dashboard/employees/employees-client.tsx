@@ -13,8 +13,16 @@ import {
   TableRow 
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Search, UserPlus, Edit, Trash2, Mail, Phone } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { toast } from 'sonner'
 
 interface Employee {
   id: string
@@ -39,6 +47,8 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
   const [employees, setEmployees] = useState<Employee[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editedEmployee, setEditedEmployee] = useState<Employee | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -88,6 +98,50 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
       case 'manager': return '매니저'
       default: return '직원'
     }
+  }
+
+  const handleEdit = (employee: Employee) => {
+    setEditingId(employee.id)
+    setEditedEmployee({ ...employee })
+  }
+
+  const handleCancel = () => {
+    setEditingId(null)
+    setEditedEmployee(null)
+  }
+
+  const handleSave = async () => {
+    if (!editedEmployee) return
+
+    try {
+      const { error } = await supabase
+        .from('employees')
+        .update({
+          role: editedEmployee.role,
+          department: editedEmployee.department,
+          is_active: editedEmployee.is_active
+        })
+        .eq('id', editedEmployee.id)
+
+      if (error) throw error
+
+      // Update local state
+      setEmployees(employees.map(emp => 
+        emp.id === editedEmployee.id ? editedEmployee : emp
+      ))
+      
+      toast.success('직원 정보가 업데이트되었습니다.')
+      setEditingId(null)
+      setEditedEmployee(null)
+    } catch (error) {
+      console.error('Error updating employee:', error)
+      toast.error('직원 정보 업데이트에 실패했습니다.')
+    }
+  }
+
+  const handleFieldChange = (field: keyof Employee, value: any) => {
+    if (!editedEmployee) return
+    setEditedEmployee({ ...editedEmployee, [field]: value })
   }
 
   return (
@@ -153,11 +207,38 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getRoleBadgeColor(employee.role)} variant="secondary">
-                          {getRoleLabel(employee.role)}
-                        </Badge>
+                        {editingId === employee.id ? (
+                          <Select
+                            value={editedEmployee?.role}
+                            onValueChange={(value) => handleFieldChange('role', value)}
+                          >
+                            <SelectTrigger className="w-[120px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">관리자</SelectItem>
+                              <SelectItem value="manager">매니저</SelectItem>
+                              <SelectItem value="employee">직원</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge className={getRoleBadgeColor(employee.role)} variant="secondary">
+                            {getRoleLabel(employee.role)}
+                          </Badge>
+                        )}
                       </TableCell>
-                      <TableCell>{employee.department || '-'}</TableCell>
+                      <TableCell>
+                        {editingId === employee.id ? (
+                          <Input
+                            value={editedEmployee?.department || ''}
+                            onChange={(e) => handleFieldChange('department', e.target.value)}
+                            className="w-[120px]"
+                            placeholder="부서명"
+                          />
+                        ) : (
+                          employee.department || '-'
+                        )}
+                      </TableCell>
                       <TableCell>
                         {employee.phone ? (
                           <div className="flex items-center gap-2">
@@ -168,18 +249,58 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                       </TableCell>
                       <TableCell>{employee.hire_date || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant={employee.is_active ? "default" : "secondary"}>
-                          {employee.is_active ? '활성' : '비활성'}
-                        </Badge>
+                        {editingId === employee.id ? (
+                          <Select
+                            value={editedEmployee?.is_active ? 'active' : 'inactive'}
+                            onValueChange={(value) => handleFieldChange('is_active', value === 'active')}
+                          >
+                            <SelectTrigger className="w-[100px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">활성</SelectItem>
+                              <SelectItem value="inactive">비활성</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge variant={employee.is_active ? "default" : "secondary"}>
+                            {employee.is_active ? '활성' : '비활성'}
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {editingId === employee.id ? (
+                            <>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={handleSave}
+                              >
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={handleCancel}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleEdit(employee)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
