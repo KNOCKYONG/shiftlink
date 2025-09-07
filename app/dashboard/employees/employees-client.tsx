@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X, ChevronDown, Filter } from 'lucide-react'
+import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X, Filter } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -231,8 +231,8 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                     <div className="flex items-center gap-1">
                       <span>역할</span>
                       <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="h-auto w-auto p-0 border-0 hover:bg-transparent [&>svg]:hidden">
-                          <ChevronDown className="h-4 w-4 text-gray-500 hover:text-gray-700" />
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">전체</SelectItem>
@@ -247,8 +247,8 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                     <div className="flex items-center gap-1">
                       <span>부서</span>
                       <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                        <SelectTrigger className="h-auto w-auto p-0 border-0 hover:bg-transparent [&>svg]:hidden">
-                          <ChevronDown className="h-4 w-4 text-gray-500 hover:text-gray-700" />
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">전체</SelectItem>
@@ -266,8 +266,8 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                     <div className="flex items-center gap-1">
                       <span>상태</span>
                       <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-auto w-auto p-0 border-0 hover:bg-transparent [&>svg]:hidden">
-                          <ChevronDown className="h-4 w-4 text-gray-500 hover:text-gray-700" />
+                        <SelectTrigger className="h-6 w-6 p-0 border-0 hover:bg-accent">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">전체</SelectItem>
