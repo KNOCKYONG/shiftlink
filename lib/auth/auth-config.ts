@@ -26,7 +26,7 @@ export const authConfig = {
   // 리다이렉트 URL
   redirectUrls: {
     signIn: '/dashboard',
-    signOut: '/login',
+    signOut: '/auth/login',
     emailConfirm: '/auth/confirm',
     passwordReset: '/auth/reset-password',
   }

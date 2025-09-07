@@ -97,7 +97,7 @@ export default function SignupPage() {
 
       // Success - show success message and redirect
       alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.')
-      router.push('/login')
+      router.push('/auth/login')
     } catch (err) {
       console.error('Signup error:', err)
       setError('회원가입 중 오류가 발생했습니다.')
@@ -262,7 +262,7 @@ export default function SignupPage() {
             <div className="text-center pt-6 border-t mt-6">
               <p className="text-sm text-gray-600">
                 이미 계정이 있으신가요?{' '}
-                <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium underline">
+                <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 font-medium underline">
                   로그인
                 </Link>
               </p>
