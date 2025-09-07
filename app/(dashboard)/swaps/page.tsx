@@ -16,7 +16,7 @@ import Link from 'next/link'
 
 export default async function SwapsPage() {
   const user = await requireAuth()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 사용자와 관련된 교환 요청 조회
   const { data: swapRequests } = await supabase

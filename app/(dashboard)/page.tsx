@@ -21,7 +21,7 @@ import Link from 'next/link'
 
 export default async function DashboardPage() {
   const user = await requireAuth()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 오늘 날짜
   const today = new Date()

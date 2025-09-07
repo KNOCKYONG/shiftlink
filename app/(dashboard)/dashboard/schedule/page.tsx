@@ -15,7 +15,7 @@ import Link from 'next/link'
 
 export default async function SchedulePage() {
   const user = await requireAuth()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 최근 스케줄 조회
   const { data: recentSchedules } = await supabase

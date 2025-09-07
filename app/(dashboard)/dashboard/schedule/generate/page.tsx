@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 export default async function GenerateSchedulePage() {
   const user = await requireManagerOrAdmin()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 팀 목록 조회
   const { data: teams, error: teamsError } = await supabase
