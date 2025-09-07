@@ -191,7 +191,7 @@ function LoginContent() {
               <p className="text-sm text-gray-600">
                 아직 계정이 없으신가요?{' '}
                 <Link 
-                  href="/signup" 
+                  href="/auth/signup" 
                   className="text-blue-600 hover:text-blue-700 font-medium underline"
                 >
                   회원가입
