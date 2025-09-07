@@ -33,12 +33,15 @@ function LoginContent() {
   // URL 파라미터에서 에러 메시지 처리
   useEffect(() => {
     const errorParam = searchParams.get('error')
+    const messageParam = searchParams.get('message')
+    
     if (errorParam) {
       const errorMessages = {
         employee_not_found: '직원 정보를 찾을 수 없습니다. 관리자에게 문의하세요.',
         account_inactive: '계정이 비활성화되었습니다. 관리자에게 문의하세요.',
         auth_check_failed: '인증 확인 중 오류가 발생했습니다. 다시 로그인해 주세요.',
-        session_expired: '세션이 만료되었습니다. 다시 로그인해 주세요.'
+        session_expired: '세션이 만료되었습니다. 다시 로그인해 주세요.',
+        auth_callback_error: messageParam ? `이메일 확인 중 오류: ${messageParam}` : '이메일 확인 중 오류가 발생했습니다. 다시 시도해 주세요.'
       }
       setError(errorMessages[errorParam as keyof typeof errorMessages] || '로그인 중 오류가 발생했습니다.')
     }

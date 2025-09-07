@@ -204,23 +204,7 @@ export async function signInWithPassword(email: string, password: string) {
   const supabase = createClient()
   
   try {
-    // employees 테이블에서 정보 확인
-    const { data: employee, error: employeeError } = await supabase
-      .from('employees')
-      .select('role, is_active, auth_user_id')
-      .eq('email', email)
-      .single()
-
-    if (employeeError) {
-      console.error('Employee lookup error:', employeeError)
-      // 직원 정보가 없어도 로그인 시도 (Auth 사용자만 있는 경우)
-    }
-
-    if (employee && !employee.is_active) {
-      return { success: false, error: '계정이 비활성화되었습니다. 관리자에게 문의하세요.' }
-    }
-
-    // Supabase Auth로 로그인
+    // Supabase Auth로 먼저 로그인 시도
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password
@@ -230,7 +214,32 @@ export async function signInWithPassword(email: string, password: string) {
       if (error.message.includes('Invalid login credentials')) {
         return { success: false, error: '이메일 또는 비밀번호가 잘못되었습니다.' }
       }
+      if (error.message.includes('Email not confirmed')) {
+        return { success: false, error: '이메일 인증이 필요합니다. 이메일을 확인해주세요.' }
+      }
       return { success: false, error: error.message }
+    }
+
+    // 로그인 성공 후 employees 테이블에서 정보 확인
+    let employeeRole = 'employee'
+    if (data.user) {
+      const { data: employee, error: employeeError } = await supabase
+        .from('employees')
+        .select('role, is_active, auth_user_id')
+        .eq('auth_user_id', data.user.id)
+        .single()
+
+      if (employeeError) {
+        console.warn('Employee record not found, using default role:', employeeError)
+        // 직원 정보가 없어도 로그인은 허용 (새로 가입한 사용자일 수 있음)
+      } else if (employee) {
+        if (!employee.is_active) {
+          // 로그아웃 처리
+          await supabase.auth.signOut()
+          return { success: false, error: '계정이 비활성화되었습니다. 관리자에게 문의하세요.' }
+        }
+        employeeRole = employee.role
+      }
     }
 
     // 로그인 성공 - 캐시에 저장
@@ -239,9 +248,9 @@ export async function signInWithPassword(email: string, password: string) {
         user: data.user,
         session: data.session,
         employee: {
-          userId: email,
+          userId: data.user.id,
           email: email,
-          role: employee?.role || 'employee'
+          role: employeeRole
         }
       })
     }

@@ -141,7 +141,6 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
         .from('employees')
         .update({
           role: editedEmployee.role,
-          department: editedEmployee.department,
           is_active: editedEmployee.is_active
         })
         .eq('id', editedEmployee.id)
@@ -165,6 +164,26 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
   const handleFieldChange = (field: keyof Employee, value: any) => {
     if (!editedEmployee) return
     setEditedEmployee({ ...editedEmployee, [field]: value })
+  }
+
+  const handleDelete = async (employeeId: string) => {
+    if (!confirm('정말로 이 직원을 삭제하시겠습니까?')) return
+
+    try {
+      const { error } = await supabase
+        .from('employees')
+        .delete()
+        .eq('id', employeeId)
+
+      if (error) throw error
+
+      // Update local state
+      setEmployees(employees.filter(emp => emp.id !== employeeId))
+      toast.success('직원이 삭제되었습니다.')
+    } catch (error) {
+      console.error('Error deleting employee:', error)
+      toast.error('직원 삭제에 실패했습니다.')
+    }
   }
 
   return (
@@ -381,7 +400,11 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleDelete(employee.id)}
+                              >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </>

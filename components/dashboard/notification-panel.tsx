@@ -13,9 +13,17 @@ interface Notification {
   type: 'swap' | 'leave' | 'schedule' | 'alert' | 'info'
   title: string
   message: string
-  timestamp: Date
-  isRead: boolean
+  // timestamp can arrive as Date or ISO string from API/Realtime
+  timestamp?: Date | string
+  created_at?: string
+  isRead?: boolean
+  is_read?: boolean
   priority?: 'high' | 'medium' | 'low'
+}
+
+type NormalizedNotification = Notification & {
+  _date: Date | null
+  _isRead: boolean
 }
 
 interface NotificationPanelProps {
@@ -118,8 +126,24 @@ export function NotificationPanel({
     }
   ]
 
-  const displayNotifications = notifications.length > 0 ? notifications : mockNotifications
-  const unreadCount = displayNotifications.filter(n => !n.isRead).length
+  const toDate = (value: any): Date | null => {
+    if (!value) return null
+    const d = value instanceof Date ? value : new Date(value)
+    return isNaN(d.getTime()) ? null : d
+  }
+
+  // Normalize incoming notifications (runtime shape may be DB rows)
+  const normalized: NormalizedNotification[] = (notifications.length > 0 ? notifications : mockNotifications).map((n: any) => {
+    const ts = n.timestamp ?? n.created_at
+    const isRead = n.isRead ?? n.is_read ?? false
+    return {
+      ...n,
+      _date: toDate(ts),
+      _isRead: isRead as boolean,
+    }
+  })
+
+  const unreadCount = normalized.filter(n => !n._isRead).length
 
   return (
     <Card className="h-full">
@@ -144,11 +168,11 @@ export function NotificationPanel({
       <CardContent>
         <ScrollArea className="h-[400px] pr-4">
           <div className="space-y-3">
-            {displayNotifications.map((notification) => (
+            {normalized.map((notification) => (
               <div
                 key={notification.id}
                 className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-gray-50 ${
-                  !notification.isRead ? 'bg-white border-blue-200' : 'bg-gray-50 border-gray-200'
+                  !notification._isRead ? 'bg-white border-blue-200' : 'bg-gray-50 border-gray-200'
                 }`}
                 onClick={() => onMarkAsRead?.(notification.id)}
               >
@@ -167,10 +191,10 @@ export function NotificationPanel({
                       {notification.message}
                     </p>
                     <p className="text-xs text-gray-400">
-                      {format(notification.timestamp, 'MM월 dd일 HH:mm', { locale: ko })}
+                      {notification._date ? format(notification._date, 'MM월 dd일 HH:mm', { locale: ko }) : ''}
                     </p>
                   </div>
-                  {!notification.isRead && (
+                  {!notification._isRead && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
                   )}
                 </div>

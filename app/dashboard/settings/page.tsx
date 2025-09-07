@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Save, AlertCircle, Check } from 'lucide-react'
+import { Loader2, Save, AlertCircle, Check, Ticket } from 'lucide-react'
 import WorkPatternPreferences from '@/components/settings/work-pattern-preferences'
 import DefaultRequests from '@/components/settings/default-requests'
 import { EmployeePreferenceSettings } from '@/components/preferences/employee-preference-settings'
@@ -167,7 +167,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="profile">프로필</TabsTrigger>
           <TabsTrigger value="password">비밀번호</TabsTrigger>
           <TabsTrigger value="preferences">근무 선호도</TabsTrigger>
@@ -177,6 +177,9 @@ export default function SettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="levels" disabled={role !== 'admin' && role !== 'manager'}>
             레벨 관리
+          </TabsTrigger>
+          <TabsTrigger value="invite" disabled={role !== 'admin' && role !== 'manager'}>
+            초대 코드
           </TabsTrigger>
         </TabsList>
 
@@ -433,6 +436,34 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="invite">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="h-5 w-5" />
+                초대 코드 관리
+              </CardTitle>
+              <CardDescription>
+                새로운 직원이 가입할 때 사용할 초대 코드를 관리합니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  초대 코드를 사용하여 새로운 직원을 조직에 초대할 수 있습니다.
+                </p>
+                <Button 
+                  onClick={() => router.push('/dashboard/settings/invite-code')}
+                  className="w-full sm:w-auto"
+                >
+                  <Ticket className="mr-2 h-4 w-4" />
+                  초대 코드 관리 페이지로 이동
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
