@@ -18,7 +18,9 @@
     "test:all": "npm run lint && npm run type-check && npm run test && npm run test:e2e",
     "deploy": "bash scripts/deploy.sh",
     "deploy:build-only": "bash scripts/deploy.sh build-only",
-    "deploy:test-only": "bash scripts/deploy.sh test-only"
+    "deploy:test-only": "bash scripts/deploy.sh test-only",
+    "reset-password": "tsx scripts/reset-admin-password.ts",
+    "init-admin": "tsx scripts/init-admin.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -82,6 +84,7 @@
     "eslint-config-next": "15.5.2",
     "jsdom": "^25.0.1",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "tw-animate-css": "^1.3.7",
     "typescript": "^5",
     "vitest": "^2.1.8"

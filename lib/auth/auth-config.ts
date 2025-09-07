@@ -1,5 +1,6 @@
 // Supabase 인증 설정
 import { createClient } from '@/lib/supabase/client'
+import { getCachedAuth, setCachedAuth, clearCachedAuth } from '@/lib/auth/auth-cache'
 
 export const authConfig = {
   // 이메일 OTP 설정
@@ -8,18 +9,6 @@ export const authConfig = {
     magicLink: true,
     otpLength: 6,
     otpExpirationTime: 300, // 5분
-  },
-  
-  // OAuth 설정
-  oauth: {
-    google: {
-      enabled: true,
-      scopes: ['email', 'profile'],
-    },
-    microsoft: {
-      enabled: true, 
-      scopes: ['email', 'profile'],
-    }
   },
   
   // 세션 설정
@@ -37,7 +26,7 @@ export const authConfig = {
   // 리다이렉트 URL
   redirectUrls: {
     signIn: '/dashboard',
-    signOut: '/auth/login',
+    signOut: '/login',
     emailConfirm: '/auth/confirm',
     passwordReset: '/auth/reset-password',
   }
@@ -95,11 +84,25 @@ export function hasAnyPermission(userRole: string, permissions: string[]): boole
 
 // 인증 상태 확인
 export async function getCurrentUser() {
+  // 먼저 캐시 확인
+  const cached = getCachedAuth()
+  if (cached && cached.user && cached.session) {
+    // 캐시된 세션이 유효한지 확인
+    const now = new Date().getTime()
+    const expires = new Date(cached.session.expires_at || 0).getTime()
+    if (expires > now) {
+      return cached
+    }
+  }
+
   const supabase = createClient()
   
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return null
+    if (authError || !user) {
+      clearCachedAuth()
+      return null
+    }
 
     // 직원 정보 조회
     const { data: employee, error: employeeError } = await supabase
@@ -122,16 +125,34 @@ export async function getCurrentUser() {
 
     if (employeeError || !employee) {
       console.error('Employee not found:', employeeError)
+      clearCachedAuth()
       return null
     }
 
-    return {
+    const result = {
       user,
       employee,
       permissions: rolePermissions[employee.role as keyof typeof rolePermissions] || []
     }
+
+    // 캐시 업데이트
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      setCachedAuth({
+        user,
+        session,
+        employee: {
+          userId: employee.email,
+          email: employee.email,
+          role: employee.role
+        }
+      })
+    }
+
+    return result
   } catch (error) {
     console.error('Auth error:', error)
+    clearCachedAuth()
     return null
   }
 }
@@ -144,6 +165,9 @@ export async function signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     
+    // 캐시 삭제
+    clearCachedAuth()
+    
     // 클라이언트 사이드 정리
     if (typeof window !== 'undefined') {
       window.location.href = authConfig.redirectUrls.signOut
@@ -154,7 +178,7 @@ export async function signOut() {
   }
 }
 
-// 이메일 OTP 로그인
+// 이메일 OTP 로그인 (사용하지 않음)
 export async function signInWithEmail(email: string) {
   const supabase = createClient()
   
@@ -175,48 +199,60 @@ export async function signInWithEmail(email: string) {
   }
 }
 
-// Google OAuth 로그인
-export async function signInWithGoogle() {
+// 이메일/비밀번호 로그인
+export async function signInWithPassword(email: string, password: string) {
   const supabase = createClient()
   
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/confirm`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        }
-      }
+    // employees 테이블에서 정보 확인
+    const { data: employee, error: employeeError } = await supabase
+      .from('employees')
+      .select('role, is_active, auth_user_id')
+      .eq('email', email)
+      .single()
+
+    if (employeeError) {
+      console.error('Employee lookup error:', employeeError)
+      // 직원 정보가 없어도 로그인 시도 (Auth 사용자만 있는 경우)
+    }
+
+    if (employee && !employee.is_active) {
+      return { success: false, error: '계정이 비활성화되었습니다. 관리자에게 문의하세요.' }
+    }
+
+    // Supabase Auth로 로그인
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
     })
     
-    if (error) throw error
+    if (error) {
+      if (error.message.includes('Invalid login credentials')) {
+        return { success: false, error: '이메일 또는 비밀번호가 잘못되었습니다.' }
+      }
+      return { success: false, error: error.message }
+    }
+
+    // 로그인 성공 - 캐시에 저장
+    if (data.user && data.session) {
+      setCachedAuth({
+        user: data.user,
+        session: data.session,
+        employee: {
+          userId: email,
+          email: email,
+          role: employee?.role || 'employee'
+        }
+      })
+    }
+
+    return { success: true, data }
   } catch (error) {
-    console.error('Google OAuth sign in error:', error)
-    throw error
+    console.error('Password sign in error:', error)
+    return { success: false, error: '로그인 중 오류가 발생했습니다.' }
   }
 }
 
-// Microsoft OAuth 로그인  
-export async function signInWithMicrosoft() {
-  const supabase = createClient()
-  
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'azure',
-      options: {
-        redirectTo: `${window.location.origin}/auth/confirm`,
-        scopes: 'email profile'
-      }
-    })
-    
-    if (error) throw error
-  } catch (error) {
-    console.error('Microsoft OAuth sign in error:', error)
-    throw error
-  }
-}
 
 // OTP 확인
 export async function verifyOtp(email: string, token: string) {

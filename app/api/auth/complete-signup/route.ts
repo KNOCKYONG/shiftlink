@@ -5,30 +5,34 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { 
-      userId, 
+      authUserId,
       email, 
       name, 
-      phone, 
-      signupType, 
-      companyName, 
-      companySlug, 
-      inviteCode 
+      role,
+      department
     } = body
 
     const supabase = await createClient()
 
+
+    // Get or create default tenant (for simplicity, using a single tenant)
+    let { data: tenant } = await supabase
+      .from('tenants')
+      .select('id, sites(id, teams(id))')
+      .eq('slug', 'default')
+      .single()
+
     let tenantId: string
     let siteId: string | null = null
     let teamId: string | null = null
-    let userRole: 'admin' | 'employee' = 'employee'
 
-    if (signupType === 'create') {
-      // Create new company (tenant)
-      const { data: tenant, error: tenantError } = await supabase
+    if (!tenant) {
+      // Create default tenant if it doesn't exist
+      const { data: newTenant, error: tenantError } = await supabase
         .from('tenants')
         .insert({
-          name: companyName,
-          slug: companySlug,
+          name: 'Default Company',
+          slug: 'default',
           settings: {
             features: {
               swap_requests: true,
@@ -43,13 +47,12 @@ export async function POST(request: Request) {
       if (tenantError) {
         console.error('Tenant creation error:', tenantError)
         return NextResponse.json(
-          { error: '회사 생성에 실패했습니다.' },
+          { error: '기본 회사 생성에 실패했습니다.' },
           { status: 400 }
         )
       }
 
-      tenantId = tenant.id
-      userRole = 'admin' // First user becomes admin
+      tenantId = newTenant.id
 
       // Create default site
       const { data: site, error: siteError } = await supabase
@@ -70,8 +73,8 @@ export async function POST(request: Request) {
           .from('teams')
           .insert({
             site_id: siteId,
-            name: '기본 팀',
-            description: '기본 팀입니다.'
+            name: department || '기본 팀',
+            description: `${department || '기본 팀'} 입니다.`
           })
           .select()
           .single()
@@ -133,33 +136,31 @@ export async function POST(request: Request) {
             color: '#8B5CF6'
           }
         ])
-
-    } else if (signupType === 'join') {
-      // Join existing company using invite code
-      // In a real app, you'd have an invites table to validate the code
-      // For now, we'll use a simple approach
-      
-      // Find tenant by invite code (simplified - you should implement proper invite system)
-      const { data: tenants, error: tenantError } = await supabase
-        .from('tenants')
-        .select('id, sites(id, teams(id))')
-        .limit(1)
-
-      if (tenantError || !tenants || tenants.length === 0) {
-        return NextResponse.json(
-          { error: '유효하지 않은 초대 코드입니다.' },
-          { status: 400 }
-        )
-      }
-
-      tenantId = tenants[0].id
-      userRole = 'employee' // Joined users are employees by default
+    } else {
+      tenantId = tenant.id
       
       // Get first site and team
-      if (tenants[0].sites && tenants[0].sites.length > 0) {
-        siteId = tenants[0].sites[0].id
-        if (tenants[0].sites[0].teams && tenants[0].sites[0].teams.length > 0) {
-          teamId = tenants[0].sites[0].teams[0].id
+      if (tenant.sites && tenant.sites.length > 0) {
+        siteId = tenant.sites[0].id
+        if (tenant.sites[0].teams && tenant.sites[0].teams.length > 0) {
+          teamId = tenant.sites[0].teams[0].id
+        }
+      }
+
+      // If team doesn't exist, create one based on department
+      if (!teamId && siteId && department) {
+        const { data: team } = await supabase
+          .from('teams')
+          .insert({
+            site_id: siteId,
+            name: department,
+            description: `${department} 팀입니다.`
+          })
+          .select()
+          .single()
+
+        if (team) {
+          teamId = team.id
         }
       }
     }
@@ -170,11 +171,11 @@ export async function POST(request: Request) {
       .insert({
         tenant_id: tenantId,
         team_id: teamId,
-        auth_user_id: userId,
+        auth_user_id: authUserId,
         email,
         name,
-        phone,
-        role: userRole,
+        role: role || 'employee',
+        department: department || null,
         employee_code: `EMP${Date.now().toString(36).toUpperCase()}`,
         hire_date: new Date().toISOString().split('T')[0],
         is_active: true,
@@ -203,7 +204,7 @@ export async function POST(request: Request) {
           message: `안녕하세요 ${name}님, ShiftLink에 가입해주셔서 감사합니다. 스케줄 관리를 시작해보세요!`,
           data: {
             type: 'welcome',
-            user_role: userRole
+            user_role: role
           }
         })
     }
@@ -213,7 +214,7 @@ export async function POST(request: Request) {
       data: {
         tenantId,
         employeeId: employee.id,
-        role: userRole
+        role: role || 'employee'
       }
     })
 
