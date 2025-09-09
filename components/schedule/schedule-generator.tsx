@@ -236,6 +236,14 @@ export function ScheduleGenerator({
     })
   }
 
+  // 먼저 파생 값 계산 (Effect에서 사용되므로 TDZ 방지)
+  const dateRange = calculateDateRange()
+  const totalDays = dateRange.length
+  const selectedTeamCount = selectedTeams.length
+  const totalEmployees = teams
+    .filter(team => selectedTeams.includes(team.id))
+    .reduce((sum, team) => sum + team.employee_count, 0)
+
   // 🧠 실시간 설정 분석 및 피드백 생성
   const analyzeConfiguration = () => {
     const messages: Array<{
@@ -395,12 +403,6 @@ export function ScheduleGenerator({
     selectedTeams.length
   ])
 
-  const dateRange = calculateDateRange()
-  const totalDays = dateRange.length
-  const selectedTeamCount = selectedTeams.length
-  const totalEmployees = teams
-    .filter(team => selectedTeams.includes(team.id))
-    .reduce((sum, team) => sum + team.employee_count, 0)
 
   return (
     <div className="space-y-6">
