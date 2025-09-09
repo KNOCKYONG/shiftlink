@@ -65,15 +65,15 @@ export function KPIWidget({
   }
 
   return (
-    <Card className={cn('transition-colors', getStatusColor(), className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    <Card className={cn('transition-colors hover:shadow-md', getStatusColor(), className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 md:p-6">
+        <CardTitle className="text-xs md:text-sm font-medium">{title}</CardTitle>
         {Icon && (
-          <Icon className={cn('h-4 w-4', iconColor || getDefaultIconColor())} />
+          <Icon className={cn('h-4 w-4 md:h-5 md:w-5', iconColor || getDefaultIconColor())} />
         )}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+        <div className="text-xl md:text-2xl font-bold">{value}</div>
         
         {subtitle && (
           <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>

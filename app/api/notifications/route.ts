@@ -5,20 +5,43 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     
-    // Get authenticated user
+    // Get authenticated user with better error handling for mobile
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    
+    if (authError) {
+      console.error('Auth error in notifications:', authError)
+      return NextResponse.json({ 
+        error: 'Authentication failed', 
+        details: authError.message,
+        mobile: request.headers.get('user-agent')?.toLowerCase().includes('mobile')
+      }, { status: 401 })
+    }
+    
+    if (!user) {
+      console.error('No user found in notifications endpoint')
+      return NextResponse.json({ 
+        error: 'User not authenticated',
+        mobile: request.headers.get('user-agent')?.toLowerCase().includes('mobile')
+      }, { status: 401 })
     }
 
-    // Get user's employee record
-    const { data: employee } = await supabase
+    // Get user's employee record with error handling
+    const { data: employee, error: employeeError } = await supabase
       .from('employees')
       .select('id, tenant_id')
       .eq('auth_user_id', user.id)
       .single()
 
+    if (employeeError) {
+      console.error('Employee fetch error:', employeeError)
+      return NextResponse.json({ 
+        error: 'Failed to fetch employee data',
+        details: employeeError.message 
+      }, { status: 500 })
+    }
+
     if (!employee) {
+      console.error('No employee record for user:', user.id)
       return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
     }
 

@@ -153,17 +153,17 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">대시보드</h2>
-        <p className="text-muted-foreground">
+      <div className="px-1">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">대시보드</h2>
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
           안녕하세요, {currentUser?.name || '사용자'}님! 오늘의 근무 현황을 확인하세요.
         </p>
       </div>
 
       {/* KPI 위젯들 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <KPIWidget
           title="오늘 근무 인원"
           value={stats.kpi.todayWorking.count}
@@ -224,7 +224,7 @@ export default function DashboardPage() {
       />
 
       {/* 알림 및 교환 요청 패널 */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 px-1 md:px-0">
         <NotificationPanel
           notifications={[...stats.notifications.unread, ...realtimeNotifications]}
           onMarkAsRead={fetchDashboardStats}
