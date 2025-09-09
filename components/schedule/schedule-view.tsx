@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, TableIcon, FileTextIcon } from 'lucide-react'
+import { CalendarIcon, TableIcon, FileTextIcon, Grid3x3 } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { MobileScheduleView } from './mobile-schedule-view'
 
 interface ScheduleViewProps {
   schedules?: any[]
@@ -19,6 +20,16 @@ interface ScheduleViewProps {
 export function ScheduleView({ schedules = [], employees = [], currentDate = new Date() }: ScheduleViewProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(currentDate)
   const [viewMode, setViewMode] = useState<'table' | 'calendar' | 'log'>('table')
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const getShiftTypeColor = (type: string, leaveType?: string) => {
     // 연차/휴가인 경우 전용 색상
@@ -105,23 +116,49 @@ export function ScheduleView({ schedules = [], employees = [], currentDate = new
       <CardContent>
         <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="table">
-              <TableIcon className="mr-2 h-4 w-4" />
-              표 보기
+            <TabsTrigger value="table" className="text-xs sm:text-sm">
+              {isMobile ? (
+                <Grid3x3 className="h-4 w-4" />
+              ) : (
+                <>
+                  <TableIcon className="mr-2 h-4 w-4" />
+                  표 보기
+                </>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="calendar">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              캘린더
+            <TabsTrigger value="calendar" className="text-xs sm:text-sm">
+              {isMobile ? (
+                <CalendarIcon className="h-4 w-4" />
+              ) : (
+                <>
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  캘린더
+                </>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="log">
-              <FileTextIcon className="mr-2 h-4 w-4" />
-              반영사항
+            <TabsTrigger value="log" className="text-xs sm:text-sm">
+              {isMobile ? (
+                <FileTextIcon className="h-4 w-4" />
+              ) : (
+                <>
+                  <FileTextIcon className="mr-2 h-4 w-4" />
+                  반영사항
+                </>
+              )}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="table" className="mt-4">
-            <div className="overflow-x-auto">
-              <Table>
+            {isMobile ? (
+              <MobileScheduleView
+                schedules={schedules}
+                currentDate={currentDate}
+                getShiftTypeColor={getShiftTypeColor}
+                getShiftTypeLabel={getShiftTypeLabel}
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">직원</TableHead>
@@ -166,6 +203,7 @@ export function ScheduleView({ schedules = [], employees = [], currentDate = new
                 </TableBody>
               </Table>
             </div>
+            )}
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-4">

@@ -23,6 +23,7 @@ import {
 import { Search, UserPlus, Edit, Trash2, Mail, Phone, Save, X, Filter } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { MobileEmployeeCard } from '@/components/employees/mobile-employee-card'
 
 interface Employee {
   id: string
@@ -49,6 +50,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedEmployee, setEditedEmployee] = useState<Employee | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
   
   // Filter states
   const [roleFilter, setRoleFilter] = useState<string>('all')
@@ -59,6 +61,12 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
 
   useEffect(() => {
     fetchEmployees()
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const fetchEmployees = async () => {
@@ -240,7 +248,70 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
             <div className="text-center py-10">
               <p className="text-gray-500">직원 목록을 불러오는 중...</p>
             </div>
+          ) : isMobile ? (
+            // Mobile card view
+            <div>
+              {/* Mobile filters */}
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="min-w-[100px]">
+                    <SelectValue placeholder="역할" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 역할</SelectItem>
+                    <SelectItem value="admin">관리자</SelectItem>
+                    <SelectItem value="manager">매니저</SelectItem>
+                    <SelectItem value="employee">직원</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                  <SelectTrigger className="min-w-[100px]">
+                    <SelectValue placeholder="부서" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 부서</SelectItem>
+                    <SelectItem value="none">미지정</SelectItem>
+                    {uniqueDepartments.map(dept => (
+                      <SelectItem key={dept} value={dept || ''}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="min-w-[100px]">
+                    <SelectValue placeholder="상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 상태</SelectItem>
+                    <SelectItem value="active">활성</SelectItem>
+                    <SelectItem value="inactive">비활성</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Mobile employee cards */}
+              <div>
+                {filteredEmployees.length > 0 ? (
+                  filteredEmployees.map((employee) => (
+                    <MobileEmployeeCard
+                      key={employee.id}
+                      employee={employee}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      getRoleBadgeColor={getRoleBadgeColor}
+                      getRoleLabel={getRoleLabel}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500">
+                    <p>조건에 맞는 직원이 없습니다.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           ) : (
+            // Desktop table view
             <Table>
               <TableHeader>
                 <TableRow>
