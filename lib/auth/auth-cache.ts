@@ -32,18 +32,32 @@ export function getCachedAuth(): CachedAuth | null {
 
     // 브라우저 환경에서만 localStorage 사용
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem(CACHE_KEY)
-      if (cached) {
-        const data: CachedAuth = JSON.parse(cached)
-        const now = Date.now()
-        
-        // 캐시 유효성 검사
-        if (now - data.timestamp < CACHE_DURATION) {
-          memoryCache = data
-          return data
-        } else {
-          // 만료된 캐시 삭제
+      const raw = localStorage.getItem(CACHE_KEY)
+      if (raw) {
+        let parsed: any
+        try {
+          parsed = JSON.parse(raw)
+          // 이중 문자열화된 경우 처리 ("{\"user\":...}")
+          if (typeof parsed === 'string') {
+            parsed = JSON.parse(parsed)
+          }
+        } catch (e) {
+          // 손상된 캐시 제거
           localStorage.removeItem(CACHE_KEY)
+          parsed = null
+        }
+
+        if (parsed && typeof parsed === 'object') {
+          const now = Date.now()
+          if (typeof parsed.timestamp !== 'number') {
+            // 필수 필드 없으면 무효화
+            localStorage.removeItem(CACHE_KEY)
+          } else if (now - parsed.timestamp < CACHE_DURATION) {
+            memoryCache = parsed as CachedAuth
+            return memoryCache
+          } else {
+            localStorage.removeItem(CACHE_KEY)
+          }
         }
       }
     }
