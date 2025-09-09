@@ -51,8 +51,8 @@ export default async function DashboardLayout({
       />
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-md min-h-[calc(100vh-73px)]">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:block w-64 bg-white shadow-md min-h-[calc(100vh-73px)]">
           <nav className="p-4 space-y-2">
             {menuItems.map((item) => {
               // Check role-based visibility
@@ -76,7 +76,7 @@ export default async function DashboardLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 md:p-6 min-h-[calc(100vh-65px)]">
           {children}
         </main>
       </div>

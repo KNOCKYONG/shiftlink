@@ -85,48 +85,48 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-4 md:space-y-6">
         {/* 로고 및 제목 */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 md:space-y-4">
           <div className="flex justify-center">
-            <div className="bg-blue-600 rounded-2xl p-4">
-              <Calendar className="h-8 w-8 text-white" />
+            <div className="bg-blue-600 rounded-2xl p-3 md:p-4">
+              <Calendar className="h-6 w-6 md:h-8 md:w-8 text-white" />
             </div>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">ShiftLink</h1>
-            <p className="text-gray-600 mt-2">3교대 소통형 스케줄링 플랫폼</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">ShiftLink</h1>
+            <p className="text-sm md:text-base text-gray-600 mt-1 md:mt-2">3교대 소통형 스케줄링 플랫폼</p>
           </div>
         </div>
 
-        {/* 특징 소개 */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-2">
-            <div className="bg-green-100 rounded-full p-3 w-fit mx-auto">
-              <BarChart3 className="h-5 w-5 text-green-600" />
+        {/* 특징 소개 - 모바일에서 더 작게 */}
+        <div className="grid grid-cols-3 gap-3 md:gap-4 text-center">
+          <div className="space-y-1 md:space-y-2">
+            <div className="bg-green-100 rounded-full p-2 md:p-3 w-fit mx-auto">
+              <BarChart3 className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
             </div>
-            <div className="text-sm text-gray-600">공정성</div>
+            <div className="text-xs md:text-sm text-gray-600">공정성</div>
           </div>
-          <div className="space-y-2">
-            <div className="bg-blue-100 rounded-full p-3 w-fit mx-auto">
-              <Users className="h-5 w-5 text-blue-600" />
+          <div className="space-y-1 md:space-y-2">
+            <div className="bg-blue-100 rounded-full p-2 md:p-3 w-fit mx-auto">
+              <Users className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
             </div>
-            <div className="text-sm text-gray-600">소통형</div>
+            <div className="text-xs md:text-sm text-gray-600">소통형</div>
           </div>
-          <div className="space-y-2">
-            <div className="bg-purple-100 rounded-full p-3 w-fit mx-auto">
-              <Calendar className="h-5 w-5 text-purple-600" />
+          <div className="space-y-1 md:space-y-2">
+            <div className="bg-purple-100 rounded-full p-2 md:p-3 w-fit mx-auto">
+              <Calendar className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
             </div>
-            <div className="text-sm text-gray-600">스마트</div>
+            <div className="text-xs md:text-sm text-gray-600">스마트</div>
           </div>
         </div>
 
         {/* 로그인 카드 */}
         <Card className="shadow-xl border-0">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl">로그인</CardTitle>
+          <CardHeader className="text-center pb-3 md:pb-4">
+            <CardTitle className="text-lg md:text-xl">로그인</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 md:space-y-6 px-4 md:px-6">
             {/* 에러 메시지 */}
             {error && (
               <Alert className="border-red-200 bg-red-50">
@@ -150,7 +150,7 @@ function LoginContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-11 pl-10"
+                    className="h-10 md:h-11 pl-10 text-sm md:text-base"
                     disabled={loading}
                   />
                 </div>
@@ -167,7 +167,7 @@ function LoginContent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 pl-10"
+                    className="h-10 md:h-11 pl-10 text-sm md:text-base"
                     disabled={loading}
                   />
                 </div>
@@ -175,7 +175,7 @@ function LoginContent() {
 
               <Button
                 type="submit"
-                className="w-full h-11"
+                className="w-full h-10 md:h-11 text-sm md:text-base"
                 disabled={loading || !email || !password}
               >
                 {loading ? (
