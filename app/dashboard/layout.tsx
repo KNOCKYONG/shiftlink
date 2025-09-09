@@ -6,14 +6,12 @@ import {
   Calendar, 
   Users, 
   Settings, 
-  LogOut,
   LayoutDashboard,
   ArrowLeftRight,
   ClipboardList,
   BarChart
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { NotificationBell } from '@/components/notifications/notification-bell'
+import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 
 export default async function DashboardLayout({
   children,
@@ -43,27 +41,14 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900">ShiftLink</h1>
-            <span className="text-sm text-gray-500">|</span>
-            <span className="text-sm text-gray-600">{user.name}</span>
-            <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-              {user.role === 'admin' ? '관리자' : user.role === 'manager' ? '매니저' : '직원'}
-            </span>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <NotificationBell userId={user.id} />
-            <form action={handleSignOut}>
-              <Button variant="ghost" size="icon" type="submit">
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader 
+        user={{
+          id: user.id,
+          name: user.name,
+          role: user.role
+        }}
+        onSignOut={handleSignOut}
+      />
 
       <div className="flex">
         {/* Sidebar */}
