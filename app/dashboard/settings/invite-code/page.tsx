@@ -128,12 +128,12 @@ export default function InviteCodePage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">초대 코드 관리</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold">초대 코드 관리</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             새로운 직원이 가입할 때 사용할 초대 코드를 관리합니다.
           </p>
         </div>
@@ -152,17 +152,17 @@ export default function InviteCodePage() {
           <CardContent className="space-y-4">
             {inviteCode && (
               <>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                   <div className="flex-1">
-                    <div className="text-3xl font-mono font-bold tracking-wider bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-mono font-bold tracking-wider bg-gray-100 dark:bg-gray-800 rounded-lg p-3 sm:p-4 text-center break-all">
                       {inviteCode}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row sm:flex-col gap-2">
                     <Button
                       onClick={copyInviteCode}
                       variant="outline"
-                      className="flex items-center gap-2"
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2"
                     >
                       <Copy className="h-4 w-4" />
                       복사
@@ -172,7 +172,7 @@ export default function InviteCodePage() {
                         onClick={regenerateInviteCode}
                         variant="destructive"
                         disabled={regenerating}
-                        className="flex items-center gap-2"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2"
                       >
                         <RefreshCw className={`h-4 w-4 ${regenerating ? 'animate-spin' : ''}`} />
                         재생성
@@ -184,7 +184,7 @@ export default function InviteCodePage() {
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
-                    <ul className="list-disc list-inside space-y-1 mt-2">
+                    <ul className="list-disc list-inside space-y-1 mt-2 text-xs sm:text-sm">
                       <li>초대 코드는 대소문자를 구분하지 않습니다.</li>
                       <li>각 조직마다 고유한 초대 코드를 가집니다.</li>
                       {userRole === 'admin' && (
@@ -204,7 +204,7 @@ export default function InviteCodePage() {
             <CardTitle>사용 방법</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="list-decimal list-inside space-y-2">
+            <ol className="list-decimal list-inside space-y-2 text-sm sm:text-base">
               <li>위의 초대 코드를 복사합니다.</li>
               <li>새로운 직원에게 초대 코드를 전달합니다.</li>
               <li>직원은 회원가입 시 초대 코드를 입력합니다.</li>
@@ -217,7 +217,7 @@ export default function InviteCodePage() {
         {userRole === 'admin' && (
           <Alert variant="destructive">
             <Shield className="h-4 w-4" />
-            <AlertDescription>
+            <AlertDescription className="text-xs sm:text-sm">
               <strong>보안 주의사항:</strong> 초대 코드를 재생성하면 이전 코드로는 더 이상 가입할 수 없습니다. 
               재생성 후에는 반드시 새로운 코드를 필요한 직원들에게 공유해주세요.
             </AlertDescription>
