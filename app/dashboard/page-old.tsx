@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { Users, UserCheck, Moon, AlertTriangle, Loader2 } from 'lucide-react'
 import { KPIWidget } from '@/components/dashboard/kpi-widget'
 import { ScheduleView } from '@/components/schedule/schedule-view'
@@ -56,10 +56,6 @@ interface DashboardStats {
   }>
 }
 
-// 캐시 키와 만료 시간 설정
-const CACHE_KEY = 'dashboard_stats'
-const CACHE_DURATION = 5 * 60 * 1000 // 5분
-
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -68,132 +64,63 @@ export default function DashboardPage() {
 
   const supabase = createClient()
 
-  // Realtime hooks - currentUser가 있을 때만 활성화
+  // Realtime hooks
   const realtimeNotifications = useRealtimeNotifications(currentUser?.id)
   const realtimeSwapRequests = useRealtimeSwapRequests(currentUser?.tenant_id)
 
-  // 캐시에서 데이터 가져오기
-  const getCachedData = useCallback(() => {
-    if (typeof window === 'undefined') return null
-    
-    const cached = localStorage.getItem(CACHE_KEY)
-    if (!cached) return null
-    
-    const { data, timestamp } = JSON.parse(cached)
-    const now = Date.now()
-    
-    // 캐시가 만료되었는지 확인
-    if (now - timestamp > CACHE_DURATION) {
-      localStorage.removeItem(CACHE_KEY)
-      return null
+  useEffect(() => {
+    getCurrentUser()
+  }, [])
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchDashboardStats()
     }
-    
-    return data
-  }, [])
+  }, [currentUser])
 
-  // 캐시에 데이터 저장
-  const setCachedData = useCallback((data: DashboardStats) => {
-    if (typeof window === 'undefined') return
-    
-    localStorage.setItem(CACHE_KEY, JSON.stringify({
-      data,
-      timestamp: Date.now()
-    }))
-  }, [])
-
-  // 병렬로 데이터 가져오기
-  const fetchAllData = useCallback(async () => {
+  const getCurrentUser = async () => {
     try {
-      // 캐시 확인
-      const cachedData = getCachedData()
-      if (cachedData) {
-        setStats(cachedData)
-        setIsLoading(false)
-        
-        // 백그라운드에서 데이터 새로고침
-        fetchDashboardStats(false)
-        return
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
       }
 
-      // 병렬로 사용자 정보와 대시보드 통계 가져오기
-      const [userResult, statsResult] = await Promise.allSettled([
-        getCurrentUserData(),
-        fetchDashboardStatsData()
-      ])
+      const { data: employee } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .single()
 
-      if (userResult.status === 'fulfilled') {
-        setCurrentUser(userResult.value)
-      } else {
-        console.error('Failed to get user:', userResult.reason)
+      if (!employee) {
+        throw new Error('Employee record not found')
       }
 
-      if (statsResult.status === 'fulfilled') {
-        setStats(statsResult.value)
-        setCachedData(statsResult.value)
-      } else {
-        throw statsResult.reason
-      }
+      setCurrentUser({ ...user, ...employee })
     } catch (err) {
-      console.error('Dashboard load error:', err)
+      console.error('Get current user error:', err)
+      setError('사용자 정보를 불러올 수 없습니다.')
+    }
+  }
+
+  const fetchDashboardStats = async () => {
+    try {
+      setIsLoading(true)
+      const today = new Date().toISOString().split('T')[0]
+      const response = await fetch(`/api/dashboard/stats?date=${today}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard statistics')
+      }
+
+      const data = await response.json()
+      setStats(data)
+    } catch (err) {
+      console.error('Dashboard stats error:', err)
       setError(err instanceof Error ? err.message : 'Failed to load dashboard')
     } finally {
       setIsLoading(false)
     }
-  }, [getCachedData, setCachedData])
-
-  const getCurrentUserData = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
-
-    const { data: employee } = await supabase
-      .from('employees')
-      .select('*')
-      .eq('auth_user_id', user.id)
-      .single()
-
-    if (!employee) throw new Error('Employee record not found')
-    
-    return { ...user, ...employee }
   }
-
-  const fetchDashboardStatsData = async () => {
-    const today = new Date().toISOString().split('T')[0]
-    const response = await fetch(`/api/dashboard/stats?date=${today}`)
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard statistics')
-    }
-
-    return response.json()
-  }
-
-  const fetchDashboardStats = useCallback(async (showLoading = true) => {
-    try {
-      if (showLoading) setIsLoading(true)
-      
-      const data = await fetchDashboardStatsData()
-      setStats(data)
-      setCachedData(data)
-    } catch (err) {
-      console.error('Dashboard stats error:', err)
-      if (showLoading) {
-        setError(err instanceof Error ? err.message : 'Failed to load dashboard')
-      }
-    } finally {
-      if (showLoading) setIsLoading(false)
-    }
-  }, [setCachedData])
-
-  useEffect(() => {
-    fetchAllData()
-    
-    // 5분마다 자동 새로고침
-    const interval = setInterval(() => {
-      fetchDashboardStats(false)
-    }, CACHE_DURATION)
-    
-    return () => clearInterval(interval)
-  }, [fetchAllData])
 
   if (isLoading) {
     return (
@@ -293,19 +220,19 @@ export default function DashboardPage() {
       {/* 스케줄 뷰 */}
       <ScheduleView 
         scheduleData={stats.todaySchedule}
-        onDateChange={() => fetchDashboardStats()}
+        onDateChange={fetchDashboardStats}
       />
 
       {/* 알림 및 교환 요청 패널 */}
       <div className="grid gap-4 lg:grid-cols-2 px-1 md:px-0">
         <NotificationPanel
           notifications={[...stats.notifications.unread, ...realtimeNotifications]}
-          onMarkAsRead={() => fetchDashboardStats()}
+          onMarkAsRead={fetchDashboardStats}
         />
         <SwapRequestPanel
           requests={[...stats.swapRequests.pending, ...realtimeSwapRequests]}
           currentUserId={currentUser?.id}
-          onRequestUpdate={() => fetchDashboardStats()}
+          onRequestUpdate={fetchDashboardStats}
         />
       </div>
     </div>

@@ -44,6 +44,10 @@ interface EmployeesClientProps {
   userTenantId: string
 }
 
+// 캐시 설정
+const EMPLOYEES_CACHE_KEY = 'employees_list'
+const CACHE_DURATION = 3 * 60 * 1000 // 3분
+
 export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps) {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -60,7 +64,22 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
   const supabase = createClient()
 
   useEffect(() => {
-    fetchEmployees()
+    // 캐시 확인
+    const cached = localStorage.getItem(EMPLOYEES_CACHE_KEY)
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached)
+      if (Date.now() - timestamp < CACHE_DURATION) {
+        setEmployees(data)
+        setLoading(false)
+        // 백그라운드에서 새로고침
+        fetchEmployees(false)
+      } else {
+        fetchEmployees()
+      }
+    } else {
+      fetchEmployees()
+    }
+    
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
     }
@@ -69,8 +88,10 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (showLoading = true) => {
     try {
+      if (showLoading) setLoading(true)
+      
       // admin은 모든 직원 조회, 그 외는 tenant_id로 필터링
       let query = supabase
         .from('employees')
@@ -84,11 +105,19 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
       const { data, error } = await query
 
       if (error) throw error
-      setEmployees(data || [])
+      
+      const employeesData = data || []
+      setEmployees(employeesData)
+      
+      // 캐시에 저장
+      localStorage.setItem(EMPLOYEES_CACHE_KEY, JSON.stringify({
+        data: employeesData,
+        timestamp: Date.now()
+      }))
     } catch (error) {
       console.error('Error fetching employees:', error)
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
 
