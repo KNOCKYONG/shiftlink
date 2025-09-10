@@ -196,15 +196,15 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">직원 관리</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">직원 관리</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             직원 정보를 관리하고 권한을 설정하세요.
             {userRole === 'admin' && ' (전체 테넌트)'}
           </p>
         </div>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <UserPlus className="mr-2 h-4 w-4" />
           직원 추가
         </Button>
@@ -212,9 +212,9 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <CardTitle>직원 목록</CardTitle>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <CardTitle className="text-lg sm:text-xl">직원 목록</CardTitle>
               {(roleFilter !== 'all' || departmentFilter !== 'all' || statusFilter !== 'all') && (
                 <Button
                   variant="ghost"
@@ -224,14 +224,14 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                     setDepartmentFilter('all')
                     setStatusFilter('all')
                   }}
-                  className="text-xs"
+                  className="text-xs w-fit"
                 >
                   <X className="h-3 w-3 mr-1" />
                   필터 초기화
                 </Button>
               )}
             </div>
-            <div className="relative w-72">
+            <div className="relative w-full lg:w-72">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="text"
@@ -254,7 +254,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
               {/* Mobile filters */}
               <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="min-w-[100px]">
+                  <SelectTrigger className="min-w-[90px] text-xs">
                     <SelectValue placeholder="역할" />
                   </SelectTrigger>
                   <SelectContent>
@@ -266,7 +266,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                 </Select>
                 
                 <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="min-w-[100px]">
+                  <SelectTrigger className="min-w-[90px] text-xs">
                     <SelectValue placeholder="부서" />
                   </SelectTrigger>
                   <SelectContent>
@@ -279,7 +279,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                 </Select>
                 
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="min-w-[100px]">
+                  <SelectTrigger className="min-w-[90px] text-xs">
                     <SelectValue placeholder="상태" />
                   </SelectTrigger>
                   <SelectContent>
@@ -312,6 +312,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
             </div>
           ) : (
             // Desktop table view
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -495,6 +496,7 @@ export function EmployeesClient({ userRole, userTenantId }: EmployeesClientProps
                 )}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

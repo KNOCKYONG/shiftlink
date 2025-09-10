@@ -160,28 +160,30 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">설정</h2>
-        <p className="text-gray-600 mt-2">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">설정</h2>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
           프로필 정보와 계정 설정을 관리하세요.
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="profile">프로필</TabsTrigger>
-          <TabsTrigger value="password">비밀번호</TabsTrigger>
-          <TabsTrigger value="preferences">근무 선호도</TabsTrigger>
-          <TabsTrigger value="requests">사전 요청사항</TabsTrigger>
-          <TabsTrigger value="hierarchy" disabled={role !== 'admin' && role !== 'manager'}>
-            조직 구조
-          </TabsTrigger>
-          <TabsTrigger value="levels" disabled={role !== 'admin' && role !== 'manager'}>
-            레벨 관리
-          </TabsTrigger>
-          <TabsTrigger value="invite" disabled={role !== 'admin' && role !== 'manager'}>
-            초대 코드
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-full min-w-max">
+            <TabsTrigger value="profile" className="text-xs sm:text-sm px-2 sm:px-3">프로필</TabsTrigger>
+            <TabsTrigger value="password" className="text-xs sm:text-sm px-2 sm:px-3">비밀번호</TabsTrigger>
+            <TabsTrigger value="preferences" className="text-xs sm:text-sm px-2 sm:px-3">근무 선호도</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs sm:text-sm px-2 sm:px-3">요청사항</TabsTrigger>
+            <TabsTrigger value="hierarchy" disabled={role !== 'admin' && role !== 'manager'} className="text-xs sm:text-sm px-2 sm:px-3">
+              조직 구조
+            </TabsTrigger>
+            <TabsTrigger value="levels" disabled={role !== 'admin' && role !== 'manager'} className="text-xs sm:text-sm px-2 sm:px-3">
+              레벨 관리
+            </TabsTrigger>
+            <TabsTrigger value="invite" disabled={role !== 'admin' && role !== 'manager'} className="text-xs sm:text-sm px-2 sm:px-3">
+              초대 코드
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="profile">
           <Card>
@@ -200,7 +202,7 @@ export default function SettingsPage() {
                   </Alert>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">이름</Label>
                     <Input
@@ -255,7 +257,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -300,6 +302,7 @@ export default function SettingsPage() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={6}
+                      className="w-full"
                     />
                   </div>
 
@@ -312,11 +315,12 @@ export default function SettingsPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={6}
+                      className="w-full"
                     />
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isLoadingPassword}>
+                <Button type="submit" disabled={isLoadingPassword} className="w-full sm:w-auto">
                   {isLoadingPassword ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

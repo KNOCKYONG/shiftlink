@@ -407,19 +407,20 @@ export function ScheduleGenerator({
   return (
     <div className="space-y-6">
       {/* 🚀 엔터프라이즈급 헤더 */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Brain className="h-6 w-6 text-blue-600" />
-            엔터프라이즈 스케줄 생성기
+          <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <Brain className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
+            <span className="hidden sm:inline">엔터프라이즈 스케줄 생성기</span>
+            <span className="sm:hidden">스케줄 생성</span>
           </h2>
-          <p className="text-gray-600 mt-1">CSP 최적화와 AI 기반 공정성 분석을 활용한 지능형 스케줄링</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">CSP 최적화와 AI 기반 공정성 분석을 활용한 지능형 스케줄링</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={cspOptimization.enabled ? "default" : "secondary"}>
-            {cspOptimization.enabled ? "CSP 최적화 활성" : "기본 모드"}
+          <Badge variant={cspOptimization.enabled ? "default" : "secondary"} className="text-xs sm:text-sm">
+            {cspOptimization.enabled ? "CSP ON" : "기본"}
           </Badge>
-          <Badge variant="outline">
+          <Badge variant="outline" className="text-xs sm:text-sm hidden sm:inline-flex">
             {cspOptimization.strategy}
           </Badge>
         </div>
@@ -543,22 +544,26 @@ export function ScheduleGenerator({
 
       {/* 🎛️ 탭 기반 설정 인터페이스 */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="basic" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            기본 설정
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsTrigger value="basic" className="text-xs sm:text-sm">
+            <Settings className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">기본 설정</span>
+            <span className="sm:hidden">기본</span>
           </TabsTrigger>
-          <TabsTrigger value="optimization" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            CSP 최적화
+          <TabsTrigger value="optimization" className="text-xs sm:text-sm">
+            <Zap className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">CSP 최적화</span>
+            <span className="sm:hidden">최적화</span>
           </TabsTrigger>
-          <TabsTrigger value="analysis" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            고급 분석
+          <TabsTrigger value="analysis" className="text-xs sm:text-sm">
+            <BarChart3 className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">고급 분석</span>
+            <span className="sm:hidden">분석</span>
           </TabsTrigger>
-          <TabsTrigger value="preview" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            미리보기
+          <TabsTrigger value="preview" className="text-xs sm:text-sm">
+            <Target className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">미리보기</span>
+            <span className="sm:hidden">미리</span>
           </TabsTrigger>
         </TabsList>
 
@@ -649,7 +654,7 @@ export function ScheduleGenerator({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {teams.map(team => (
                   <div
                     key={team.id}
@@ -666,8 +671,8 @@ export function ScheduleGenerator({
                         readOnly
                       />
                       <div className="flex-1">
-                        <div className="font-medium">{team.name}</div>
-                        <div className="text-sm text-gray-500">
+                        <div className="font-medium text-sm sm:text-base">{team.name}</div>
+                        <div className="text-xs sm:text-sm text-gray-500">
                           {team.employee_count}명
                         </div>
                       </div>
@@ -1076,43 +1081,43 @@ export function ScheduleGenerator({
             </CardHeader>
             <CardContent className="space-y-4">
               {/* 예상 성능 지표 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-3 sm:p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <Gauge className="h-5 w-5 text-blue-600" />
-                    <span className="font-medium">예상 처리 시간</span>
+                    <Gauge className="h-4 sm:h-5 w-4 sm:w-5 text-blue-600" />
+                    <span className="text-sm sm:text-base font-medium">예상 처리 시간</span>
                   </div>
-                  <div className="text-2xl font-bold text-blue-700 mt-2">
+                  <div className="text-xl sm:text-2xl font-bold text-blue-700 mt-2">
                     {cspOptimization.enabled ? `${Math.ceil(totalEmployees * totalDays / 50)}분` : '< 1분'}
                   </div>
-                  <p className="text-sm text-blue-600">
+                  <p className="text-xs sm:text-sm text-blue-600">
                     {cspOptimization.enabled ? 'CSP 최적화 포함' : '기본 알고리즘'}
                   </p>
                 </div>
 
-                <div className="p-4 bg-green-50 rounded-lg">
+                <div className="p-3 sm:p-4 bg-green-50 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    <span className="font-medium">예상 공정성 점수</span>
+                    <TrendingUp className="h-4 sm:h-5 w-4 sm:w-5 text-green-600" />
+                    <span className="text-sm sm:text-base font-medium">예상 공정성 점수</span>
                   </div>
-                  <div className="text-2xl font-bold text-green-700 mt-2">
+                  <div className="text-xl sm:text-2xl font-bold text-green-700 mt-2">
                     {Math.round((1 - cspOptimization.fairness_target) * 100)}점
                   </div>
-                  <p className="text-sm text-green-600">
+                  <p className="text-xs sm:text-sm text-green-600">
                     Gini 계수 {cspOptimization.fairness_target} 기준
                   </p>
                 </div>
 
-                <div className="p-4 bg-purple-50 rounded-lg">
+                <div className="p-3 sm:p-4 bg-purple-50 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-purple-600" />
-                    <span className="font-medium">안전성 등급</span>
+                    <Shield className="h-4 sm:h-5 w-4 sm:w-5 text-purple-600" />
+                    <span className="text-sm sm:text-base font-medium">안전성 등급</span>
                   </div>
-                  <div className="text-2xl font-bold text-purple-700 mt-2">
+                  <div className="text-xl sm:text-2xl font-bold text-purple-700 mt-2">
                     {cspOptimization.safety_priority === 'strict' ? 'A+' : 
                      cspOptimization.safety_priority === 'balanced' ? 'A' : 'B+'}
                   </div>
-                  <p className="text-sm text-purple-600">
+                  <p className="text-xs sm:text-sm text-purple-600">
                     {cspOptimization.safety_priority === 'strict' ? '최고 안전성' : 
                      cspOptimization.safety_priority === 'balanced' ? '균형 잡힌 안전성' : '효율성 우선'}
                   </p>
@@ -1139,7 +1144,7 @@ export function ScheduleGenerator({
           size="lg"
           disabled={!isFormValid() || isGenerating}
           onClick={handleGenerate}
-          className={`w-full md:w-auto min-w-64 ${
+          className={`w-full sm:w-auto sm:min-w-64 ${
             cspOptimization.enabled 
               ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' 
               : ''
@@ -1271,17 +1276,17 @@ export function ScheduleGenerator({
             </div>
 
             {/* 실시간 통계 */}
-            <div className="grid grid-cols-3 gap-4 p-4 bg-white/60 rounded-lg border">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 p-3 sm:p-4 bg-white/60 rounded-lg border">
               <div className="text-center">
-                <div className="text-lg font-bold text-blue-700">{totalEmployees}</div>
+                <div className="text-base sm:text-lg font-bold text-blue-700">{totalEmployees}</div>
                 <div className="text-xs text-gray-600">처리 대상 직원</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-purple-700">{totalDays}</div>
+                <div className="text-base sm:text-lg font-bold text-purple-700">{totalDays}</div>
                 <div className="text-xs text-gray-600">스케줄 기간(일)</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-green-700">
+                <div className="text-base sm:text-lg font-bold text-green-700">
                   {cspOptimization.enabled ? `~${Math.ceil(totalEmployees * totalDays / 50)}분` : '<1분'}
                 </div>
                 <div className="text-xs text-gray-600">예상 완료 시간</div>
